@@ -27,7 +27,7 @@ class Reading:
         return float(self._real_alt)
 
     def now(self):
-        return self._now
+        return time.mktime(self._now)
 
     def temperature_out(self):
         return f'Temp = {self._temperature}C'
