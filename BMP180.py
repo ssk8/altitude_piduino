@@ -1,6 +1,6 @@
 import serial
 import time
-
+import csv
 
 class Reading:
     def __init__(self, temperature, pressure, altitude, pres_sl, real_alt, now):
@@ -46,6 +46,11 @@ class Reading:
 
     def now_out(self):
         return f'Time: {time.strftime("%H:%M:%S", self._now)}'
+    
+    def save_reading(self):
+        with open('data.csv', 'a', newline='') as csvfile:
+            data_write = csv.writer(csvfile, delimiter=',')
+            data_write.writerow([self.now(), self.temperature(), self.pressure(), self.altitude(), self.pres_sl(), self.real_alt()])
 
 
 class BMP180():
@@ -70,6 +75,7 @@ def main(sensor):
     while True:
         reading = sensor.get_reading()
         print(f'{reading.now_out()} {reading.temperature_out()} {reading.altitude_out()}')
+        reading.save_reading()
 
 
 if __name__ == "__main__":

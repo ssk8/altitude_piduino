@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-
 import time
-import subprocess
 import digitalio
 import board
 from PIL import Image, ImageDraw, ImageFont
@@ -34,21 +31,30 @@ x = 0
 
 font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 24)
 
+buttonA = digitalio.DigitalInOut(board.D23)
+buttonB = digitalio.DigitalInOut(board.D24)
+recording = False
 backlight = digitalio.DigitalInOut(board.D22)
 backlight.switch_to_output()
 backlight.value = True
 bmp180 = BMP180.BMP180()
 
 while True:
+    if not buttonA.value:
+        backlight.value = not backlight.value
+    if not buttonB.value:
+        recording = not recording
     # Draw a black filled box to clear the image.
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
     reading = bmp180.get_reading()
+    if recording:
+        reading.save_reading()
 
-    line1 = reading.altitude_out()
-    line2 = reading.now_out()
+    line1 = '< turn off backlight'
+    line2 = reading.altitude_out()
     line3 = reading.temperature_out()
-    line4 = 'Bollocks'
-    line5 = '          Busta'
+    line4 = f'{(not recording)*"not"} recording'
+    line5 = reading.now_out()
 
     y = top
     draw.text((x, y), line1, font=font, fill="#FFFFFF")
